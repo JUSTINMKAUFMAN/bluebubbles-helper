@@ -192,9 +192,11 @@ NSMutableArray* vettedAliases;
         // Get the IMChat instance for the guid specified in eventData
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
         if(chat != nil) {
-            // If the IMChat instance is not null, start typing
+            NSLog(@"Start typing on %@", data[@"chatGuid"]);
+            [chat setTypingGUID: data[@"chatGuid"]];
             [chat setLocalUserIsTyping:YES];
-
+            NSTimeInterval interval = 4.0;
+            [chat setLatestTypingIndicatorTimeInterval:interval];
             if (transaction != nil) {
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
@@ -205,9 +207,11 @@ NSMutableArray* vettedAliases;
         // Get the IMChat instance for the guid specified in eventData
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
         if(chat != nil) {
-            // If the IMChat instance is not null, stop typing
+            NSLog(@"Stop typing on %@", data[@"chatGuid"]);
+            [chat setTypingGUID:nil];
             [chat setLocalUserIsTyping:NO];
-
+            NSTimeInterval interval = 0.0;
+            [chat setLatestTypingIndicatorTimeInterval:interval];
             if (transaction != nil) {
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
@@ -673,9 +677,8 @@ NSMutableArray* vettedAliases;
         if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion == 11) {
             [[IMNicknameController sharedInstance] whitelistHandlesForNicknameSharing:[chat participants] forChat:chat];
         } else {
-            IMHandle *handle = [[[IMAccountController sharedInstance] activeIMessageAccount] imHandleWithID:(data[@"address"])];
-            
-            [[IMNicknameController sharedInstance] allowHandlesForNicknameSharing:[chat participants] forChat:chat fromHandle:handle forceSend:FALSE];
+            IMAccount *account = [[IMAccountController sharedInstance] activeIMessageAccount];
+            [[IMNicknameController sharedInstance] allowHandlesForNicknameSharing:[chat participants] fromHandle:[account displayName] forceSend:TRUE];
         }
         if (transaction != nil) {
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
