@@ -671,10 +671,12 @@ NSMutableArray* vettedAliases;
     } else if ([event isEqualToString:@"share-nickname"]) {
         IMChat *chat = [BlueBubblesHelper getChat:data[@"chatGuid"] :transaction];
 
-        if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion >= 11) {
+        if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion == 11) {
             [[IMNicknameController sharedInstance] whitelistHandlesForNicknameSharing:[chat participants] forChat:chat];
         } else {
-            [[IMNicknameController sharedInstance] allowHandlesForNicknameSharing:[chat participants] forChat:chat];
+            IMHandle *handle = [[[IMAccountController sharedInstance] activeIMessageAccount] imHandleWithID:(data[@"address"])];
+            
+            [[IMNicknameController sharedInstance] allowHandlesForNicknameSharing:[chat participants] forChat:chat fromHandle:handle forceSend:FALSE];
         }
         if (transaction != nil) {
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
@@ -1010,12 +1012,17 @@ NSMutableArray* vettedAliases;
             messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(nil) flags:(0x5) error:(nil) guid:(nil) subject:(nil) associatedMessageGUID:(associatedMessageGuid) associatedMessageType:*(reaction) associatedMessageRange:(range) messageSummaryInfo:(summaryInfo)];
         }
         if (ddScan) {
-            [[IMDDController sharedInstance] scanMessage:messageToSend outgoing:TRUE waitUntilDone:TRUE completionBlock:^(NSObject* temp, NSObject* ddMessageToSend) {
-                [chat sendMessage:(ddMessageToSend)];
-                if (transaction != nil) {
-                    [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastSentMessage] guid]}];
-                }
-            }];
+            __strong typeof(messageToSend) strongMessage = messageToSend;
+            __strong typeof(chat) strongChat = chat;
+            
+            [[IMDDController sharedInstance] scanMessage:strongMessage outgoing:TRUE waitUntilDone:TRUE completionBlock:^(NSInteger status, BOOL success, id result) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [strongChat sendMessage:(strongMessage)];
+                    if (transaction != nil) {
+                        [[NetworkController sharedInstance]sendMessage:@{@"transactionId": transaction, @"identifier": [[strongChat lastSentMessage] guid]}];
+                    }
+                });
+             }];
         } else {
             [chat sendMessage:(messageToSend)];
             if (transaction != nil) {
@@ -1409,5 +1416,4 @@ ZKSwizzleInterface(BBH_IMAccount, IMAccount, NSObject)
 //}
 //
 //@end
-
 
