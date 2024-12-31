@@ -154,8 +154,7 @@ NSMutableArray* vettedAliases;
     for (unsigned int i = 0; i < methodCount; i++) {
         Method method = methods[i];
 
-        DLog("\tBLUEBUBBLESHELPER: '%s' has method named '%s' of encoding '%s'\n",
-               class_getName(clz),
+        DLog("\tBLUEBUBBLESHELPER: '%s' of encoding '%s'\n",
                sel_getName(method_getName(method)),
                method_getTypeEncoding(method));
     }
@@ -923,7 +922,7 @@ NSMutableArray* vettedAliases;
  */
 +(IMFileTransfer *) prepareFileTransferForAttachment:(NSURL *) originalPath filename:(NSString *) filename {
     // Creates the initial guid for the file transfer (cannot use for sending)
-    NSString *transferInitGuid = [[IMFileTransferCenter sharedInstance] guidForNewOutgoingTransferWithLocalURL:originalPath useLegacyGuid:YES];
+    NSString *transferInitGuid = [[IMFileTransferCenter sharedInstance] guidForNewOutgoingTransferWithLocalURL:originalPath];
     DLog("BLUEBUBBLESHELPER: Transfer GUID: %{public}@", transferInitGuid);
 
     // Creates the initial transfer object
