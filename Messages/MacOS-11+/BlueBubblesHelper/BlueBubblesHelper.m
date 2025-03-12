@@ -995,6 +995,11 @@ NSMutableArray* vettedAliases;
         effectId = data[@"effectId"];
     }
     
+    NSNumber *scheduled = nil;
+    if (data[@"scheduled"] != [NSNull null]) {
+        scheduled = data[@"scheduled"];
+    }
+    
     BOOL isAudioMessage = false;
     if (data[@"isAudioMessage"] != [NSNull null]) {
         isAudioMessage = [data[@"isAudioMessage"] integerValue] == 1;
@@ -1007,6 +1012,11 @@ NSMutableArray* vettedAliases;
 
     void (^createMessage)(NSAttributedString*, NSAttributedString*, NSString*, NSString*, NSString*, long long*, NSRange, NSDictionary*, NSArray*, BOOL, BOOL) = ^(NSAttributedString *message, NSAttributedString *subject, NSString *effectId, NSString *threadIdentifier, NSString *associatedMessageGuid, long long *reaction, NSRange range, NSDictionary *summaryInfo, NSArray *transferGUIDs, BOOL isAudioMessage, BOOL ddScan) {
         IMMessage *messageToSend = [[IMMessage alloc] init];
+        
+        if (scheduled != nil) {
+            
+        }
+        
         if (reaction == nil) {
             messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(transferGUIDs) flags:(isAudioMessage ? 0x300005 : (subject ? 0x10000d : 0x100005)) error:(nil) guid:(nil) subject:(nil) balloonBundleID:(nil) payloadData:(nil) expressiveSendStyleID:(effectId)];
             messageToSend.threadIdentifier = threadIdentifier;
