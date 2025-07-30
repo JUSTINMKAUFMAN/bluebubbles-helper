@@ -1010,6 +1010,11 @@ NSMutableArray* vettedAliases;
         ddScan = [data[@"ddScan"] integerValue] == 1;
     }
 
+    // Capture variables safely to prevent PAC violations in blocks
+    // Use strong references instead of __block to avoid PAC issues
+    IMChat * __strong safeChatRef = chat;
+    NSString * __strong safeTransactionRef = transaction;
+    
     void (^createMessage)(NSAttributedString*, NSAttributedString*, NSString*, NSString*, NSString*, long long*, NSRange, NSDictionary*, NSArray*, BOOL, BOOL) = ^(NSAttributedString *message, NSAttributedString *subject, NSString *effectId, NSString *threadIdentifier, NSString *associatedMessageGuid, long long *reaction, NSRange range, NSDictionary *summaryInfo, NSArray *transferGUIDs, BOOL isAudioMessage, BOOL ddScan) {
         IMMessage *messageToSend = [[IMMessage alloc] init];
         
@@ -1023,28 +1028,36 @@ NSMutableArray* vettedAliases;
         } else {
             messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(nil) flags:(0x5) error:(nil) guid:(nil) subject:(nil) associatedMessageGUID:(associatedMessageGuid) associatedMessageType:*(reaction) associatedMessageRange:(range) messageSummaryInfo:(summaryInfo)];
         }
+        
         if (ddScan) {
-            __strong typeof(messageToSend) strongMessage = messageToSend;
-            __strong typeof(chat) strongChat = chat;
-            
-            [[IMDDController sharedInstance] scanMessage:strongMessage outgoing:TRUE waitUntilDone:TRUE completionBlock:^(NSInteger status, BOOL success, id result) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [strongChat sendMessage:(strongMessage)];
-                    if (transaction != nil) {
-                        [[NetworkController sharedInstance]sendMessage:@{@"transactionId": transaction, @"identifier": [[strongChat lastSentMessage] guid]}];
-                    }
-                });
-             }];
+            [[IMDDController sharedInstance]
+                scanMessage:messageToSend
+                outgoing:YES
+                waitUntilDone:YES
+                completionBlock:^(BOOL didScan, IMMessage *scannedMessage) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [chat sendMessage:scannedMessage];
+                        if (transaction != nil) {
+                            [[NetworkController sharedInstance] sendMessage:@{
+                                @"transactionId": transaction,
+                                @"identifier": [[chat lastSentMessage] guid]
+                            }];
+                        }
+                    });
+                }
+            ];
         } else {
-            [chat sendMessage:(messageToSend)];
-            if (transaction != nil) {
-                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastSentMessage] guid]}];
+            if (safeChatRef && messageToSend) {
+                [safeChatRef sendMessage:messageToSend];
+                if (safeTransactionRef != nil) {
+                    [[NetworkController sharedInstance] sendMessage: @{@"transactionId": safeTransactionRef, @"identifier": [[safeChatRef lastSentMessage] guid]}];
+                }
             }
         }
     };
 
     if (data[@"selectedMessageGuid"] != [NSNull null] && [data[@"selectedMessageGuid"] length] != 0) {
-        [BlueBubblesHelper getMessageItem:(chat) :(data[@"selectedMessageGuid"]) completionBlock:^(IMMessage *message) {
+        [BlueBubblesHelper getMessageItem:(safeChatRef) :(data[@"selectedMessageGuid"]) completionBlock:^(IMMessage *message) {
             IMMessageItem *messageItem = (IMMessageItem *)message._imMessageItem;
             NSObject *items = messageItem._newChatItems;
             IMMessagePartChatItem *item;

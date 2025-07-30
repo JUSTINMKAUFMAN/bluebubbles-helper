@@ -22,6 +22,7 @@
 		A65C21A72A9AAB1500D6FB7F /* BlueBubblesHelper.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = A62991CB29720FAC00B7E663 /* BlueBubblesHelper.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A69960EA2B1F9A700081FB69 /* FMF.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A69960E92B1F9A6F0081FB69 /* FMF.framework */; };
 		A69960F52B20D89C0081FB69 /* CTBlockDescription.m in Sources */ = {isa = PBXBuildFile; fileRef = A69960F42B20D8860081FB69 /* CTBlockDescription.m */; };
+		D033A7762E3A9EAC006D94B4 /* BlueBubblesHelper.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = A62991CB29720FAC00B7E663 /* BlueBubblesHelper.dylib */; };
 		D0DF3A132D23493E00270902 /* GCDAsyncUdpSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = D0DF3A112D23493E00270902 /* GCDAsyncUdpSocket.h */; };
 		D0DF3A142D23493E00270902 /* GCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = D0DF3A0F2D23493E00270902 /* GCDAsyncSocket.h */; };
 		D0DF3A152D23493E00270902 /* GCDAsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = D0DF3A122D23493E00270902 /* GCDAsyncUdpSocket.m */; };
@@ -32,10 +33,20 @@
 		A65C21A62A9AAAE600D6FB7F /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
-			dstPath = "/Users/justin/Documents/bluebubbles-server/packages/server/appResources/private-api/macos11";
+			dstPath = "/Users/justin/Repositories/bluebubbles-server/packages/server/appResources/private-api/macos11";
 			dstSubfolderSpec = 0;
 			files = (
 				A65C21A72A9AAB1500D6FB7F /* BlueBubblesHelper.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D033A7752E3A9E61006D94B4 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "/Applications/BlueBubbles.app/Contents/Resources/appResources/private-api/macos11";
+			dstSubfolderSpec = 0;
+			files = (
+				D033A7762E3A9EAC006D94B4 /* BlueBubblesHelper.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -343,6 +354,7 @@
 				A62991C929720FAC00B7E663 /* Frameworks */,
 				A6490A0D29846973002B0E1D /* Resources */,
 				A65C21A62A9AAAE600D6FB7F /* CopyFiles */,
+				D033A7752E3A9E61006D94B4 /* CopyFiles */,
 				A6490A0F29846A3A002B0E1D /* Run Script */,
 			);
 			buildRules = (
