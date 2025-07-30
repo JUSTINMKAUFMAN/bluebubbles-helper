@@ -201,9 +201,17 @@
 - (void)sendMessage:(id)arg1;
 - (void)_fixItemForSendingMessageTime:(id)arg1;
 - (void)_sendMessage:(id)arg1 adjustingSender:(BOOL)arg2 shouldQueue:(BOOL)arg3;
-- (void)cancelMessage:(id)arg1;
 - (void)declineInvitation;
 - (void)acceptInvitation;
+
+- (bool)hasCancellableScheduledMessage;
+- (void)cancelMessage:(id)arg1;
+- (void)cancelScheduledMessageItem:(id)arg1 cancelType:(unsigned long long)arg2;
+- (void)cancelScheduledMessageWithGUID:(id)arg1 destinations:(id)arg2 cancelType:(unsigned long long)arg3;
+- (void)cancelScheduledMessageItem:(id)arg1 atPartIndex:(long long)arg2 shouldRetractSubject:(bool)arg3;
+
+@property (assign,nonatomic) bool hasCancellableScheduledMessage;                                        //@synthesize hasCancellableScheduledMessage=_hasCancellableScheduledMessage - In the implementation block
+
 @property(readonly, nonatomic) BOOL hasUnhandledInvitation;
 @property(readonly, nonatomic) NSString *roomNameWithoutSuffix;
 @property(readonly, nonatomic) NSString *deviceIndependentID;
